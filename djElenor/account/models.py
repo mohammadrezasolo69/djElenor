@@ -125,29 +125,29 @@ class Address(models.Model):
 
 class UserManager(BaseUserManager["User"]):
     def create_user(
-            self, email, password=None, is_staff=False, is_active=True, **extra_fields
+            self,username , email, password=None, is_staff=False, is_active=True, **extra_fields
     ):
         """Create a user instance with the given email and password."""
         email = UserManager.normalize_email(email)
         # Google OAuth2 backend send unnecessary username field
-        extra_fields.pop("username", None)
+        # extra_fields.pop("username", None)
 
         user = self.model(
-            email=email, is_active=is_active, is_staff=is_staff, **extra_fields
+            username=username, email=email, is_active=is_active, is_staff=is_staff, **extra_fields
         )
         if password:
             user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, username, email, password=None, **extra_fields):
         user = self.create_user(
-            email, password, is_staff=True, is_superuser=True, **extra_fields
+            username, email, password, is_staff=True, is_superuser=True, **extra_fields
         )
         group, created = Group.objects.get_or_create(name="Full Access")
         # if created:
-            # group.permissions.add(*get_permissions())
-        group.user_set.add(user)  # type: ignore[attr-defined]
+        # group.permissions.add(*get_permissions())
+        # group.user_set.add(user)  # type: ignore[attr-defined]
         return user
 
     def customers(self):
@@ -162,7 +162,7 @@ class UserManager(BaseUserManager["User"]):
 
 
 class User(
-     AbstractUser
+    AbstractUser
 ):
     # email = models.EmailField(unique=True)
     # first_name = models.CharField(max_length=256, blank=True)
@@ -398,7 +398,6 @@ class StaffNotificationRecipient(models.Model):
 
     def get_email(self):
         return self.user.email if self.user else self.staff_email
-
 
 # class GroupManager(models.Manager):
 #     """The manager for the auth's Group model."""
