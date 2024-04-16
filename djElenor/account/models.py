@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import Iterable
 from functools import partial
 from typing import Union
@@ -125,7 +126,7 @@ class Address(models.Model):
 
 class UserManager(BaseUserManager["User"]):
     def create_user(
-            self,username , email, password=None, is_staff=False, is_active=True, **extra_fields
+            self, username, email, password=None, is_staff=False, is_active=True, **extra_fields
     ):
         """Create a user instance with the given email and password."""
         email = UserManager.normalize_email(email)
@@ -399,6 +400,7 @@ class StaffNotificationRecipient(models.Model):
     def get_email(self):
         return self.user.email if self.user else self.staff_email
 
+
 # class GroupManager(models.Manager):
 #     """The manager for the auth's Group model."""
 #
@@ -446,3 +448,13 @@ class StaffNotificationRecipient(models.Model):
 #
 #     def natural_key(self):
 #         return (self.name,)
+class OTPRequest(models.Model):
+    class OtpChannel(models.TextChoices):
+        PHONE = "phone", "Phone"
+        EMAIL = "email", "Email"
+
+    request_id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    channel = models.CharField(max_length=10, choices=OtpChannel.choices, default=OtpChannel.PHONE)
+    receiver = models.CharField(max_length=50)
+    password = models.CharField(max_length=4)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)

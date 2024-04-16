@@ -180,7 +180,6 @@ GRAPHQL_JWT = {
     "JWT_SECRET_KEY": SECRET_KEY,
     "JWT_ALGORITHM": "HS256",
 }
-
 GRAPHENE = {
     "SCHEMA": "djElenor.graphql.api.schema",
     'MIDDLEWARE': [
