@@ -1,0 +1,14 @@
+# Base ENV
+SECRET_KEY = 'xoxoxoxoxoxoxoxo'
+DEBUG = 'xoxoxoxoxoxoxoxo'
+JWT_ALGORITHM = 'xoxoxoxoxoxoxoxo'
+DEFAULT_COUNTRY = 'xoxoxoxoxoxoxoxo'
+MAX_USER_ADDRESSES= 'xoxoxoxoxoxoxoxo'
+
+# Database ENV
+ENGINE_DB = 'xoxoxoxoxoxoxoxo'
+NAME_DB = 'xoxoxoxoxoxoxoxo'
+USER_DB = 'xoxoxoxoxoxoxoxo'
+PASSWORD_DB = 'xoxoxoxoxoxoxoxo'
+HOST_DB = 'xoxoxoxoxoxoxoxo'
+PORT_DB = 'xoxoxoxoxoxoxoxo'
