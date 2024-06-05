@@ -12,18 +12,22 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import environ
+
+env = environ.Env(DEBUG=(bool, False))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$_7w+f36%c732$qf0xa#!a&2qdhdyh*s#o=ij0a8q6v)nr2$@b'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 SITE_ID = 1
 
 ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
@@ -39,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+
     # Local
     # 'djElenor.auth',
     'djElenor.plugins',
@@ -105,23 +110,18 @@ WSGI_APPLICATION = 'djElenor.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'elenor',
-        'USER': 'fanim',
-        'PASSWORD': '123',
-        'HOST': 'localhost',  # or your PostgreSQL server address
-        'PORT': '5432',  # default PostgreSQL port
+        'NAME': env("NAME_DB"),
+        'USER': env("USER_DB"),
+        'PASSWORD': env("PASSWORD_DB"),
+        'HOST': env("HOST_DB"),
+        'PORT': env("PORT_DB"),
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -161,6 +161,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static/'
 
 # Media files
 MEDIA_URL = '/media/'
@@ -178,7 +179,7 @@ GRAPHQL_JWT = {
     "JWT_EXPIRATION_DELTA": timedelta(minutes=10),
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     "JWT_SECRET_KEY": SECRET_KEY,
-    "JWT_ALGORITHM": "HS256",
+    "JWT_ALGORITHM": env("JWT_ALGORITHM"),
 }
 GRAPHENE = {
     "SCHEMA": "djElenor.graphql.api.schema",
@@ -189,7 +190,7 @@ GRAPHENE = {
 
 AUTH_USER_MODEL = "account.User"
 
-DEFAULT_COUNTRY = os.environ.get("DEFAULT_COUNTRY", "US")
+DEFAULT_COUNTRY = env("DEFAULT_COUNTRY")
 DEFAULT_DECIMAL_PLACES = 3
 DEFAULT_MAX_DIGITS = 12
 DEFAULT_CURRENCY_CODE_LENGTH = 3
@@ -201,4 +202,4 @@ DEFAULT_MAX_EMAIL_DISPLAY_NAME_LENGTH = 78
 
 COUNTRIES_OVERRIDE = {"EU": "European Union"}
 
-MAX_USER_ADDRESSES = int(os.environ.get("MAX_USER_ADDRESSES", 100))
+MAX_USER_ADDRESSES = int(env('MAX_USER_ADDRESSES'))
