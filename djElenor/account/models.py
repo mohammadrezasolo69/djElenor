@@ -134,6 +134,8 @@ class User(AbstractUser):
                 opclasses=["gin_trgm_ops"] * 3),
         ]
 
+    username = None
+
     uuid = models.UUIDField(default=uuid.uuid4(), unique=True)
     avatar = models.ImageField(upload_to="user-avatars", blank=True, null=True)
     phone_number = PhoneNumberField(unique=True,blank=True)
