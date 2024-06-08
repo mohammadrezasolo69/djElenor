@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'djElenor.checkout',
     'djElenor.core',
     'djElenor.csv',
-    'djElenor.graphql',
     'djElenor.menu',
     'djElenor.order',
     'djElenor.invoice',
@@ -122,7 +121,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -182,7 +180,7 @@ GRAPHQL_JWT = {
     "JWT_ALGORITHM": env("JWT_ALGORITHM"),
 }
 GRAPHENE = {
-    "SCHEMA": "djElenor.graphql.api.schema",
+    "SCHEMA": "djElenor.schema.schema",
     'MIDDLEWARE': [
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
