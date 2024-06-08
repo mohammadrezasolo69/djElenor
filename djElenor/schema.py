@@ -12,7 +12,11 @@ class Query(
     pass
 
 
-schema = graphene.Schema(
-    query=Query,
-    auto_camelcase=False
-)
+class Mutation(
+    account.Mutation,
+    graphene.ObjectType
+):
+    pass
+
+
+schema = graphene.Schema(query=Query, mutation=Mutation, auto_camelcase=False)
