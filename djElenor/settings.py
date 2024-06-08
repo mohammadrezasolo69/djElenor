@@ -74,6 +74,7 @@ INSTALLED_APPS = [
 
     # Third party
     'graphene_django',
+    "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
 ]
 
 MIDDLEWARE = [
@@ -178,6 +179,7 @@ GRAPHQL_JWT = {
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     "JWT_SECRET_KEY": SECRET_KEY,
     "JWT_ALGORITHM": env("JWT_ALGORITHM"),
+    'JWT_PAYLOAD_HANDLER': 'djElenor.utils.custom_jwt_payload_handler.custom_jwt_payload_handler',
 }
 GRAPHENE = {
     "SCHEMA": "djElenor.schema.schema",
