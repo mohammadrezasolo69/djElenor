@@ -126,7 +126,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-        ordering = ("-created_at",)
+        ordering = ("-id",)
         indexes = [
             GinIndex(name="user_search_gin", fields=["search_document"], opclasses=["gin_trgm_ops"]),
             GinIndex(
@@ -136,7 +136,7 @@ class User(AbstractUser):
 
     uuid = models.UUIDField(default=uuid.uuid4(), unique=True)
     avatar = models.ImageField(upload_to="user-avatars", blank=True, null=True)
-    phone_number = PhoneNumberField(unique=True)
+    phone_number = PhoneNumberField(unique=True,blank=True)
     note = models.TextField(null=True, blank=True)
     language_code = models.CharField(max_length=10, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     search_document = models.TextField(blank=True, null=True)
@@ -152,9 +152,9 @@ class User(AbstractUser):
     # ---------------------- Relation Fields ----------------------
     addresses = models.ManyToManyField(Address, blank=True, related_name="users")
     default_shipping_address = models.ForeignKey(
-        Address, on_delete=models.SET_NULL, related_name="users", null=True, blank=True)
+        Address, on_delete=models.SET_NULL, null=True, blank=True,related_name='+')
     default_billing_address = models.ForeignKey(
-        Address, on_delete=models.SET_NULL, related_name="users", null=True, blank=True)
+        Address, on_delete=models.SET_NULL, null=True, blank=True,related_name='+')
 
     # ---------------------- Setting ----------------------
     objects = CustomUserManager()
@@ -164,15 +164,17 @@ class User(AbstractUser):
     # ---------------------- Methods ----------------------
 
     def __str__(self):
-        return self.phone_number
+        return str(self.uuid)
 
     @property
     def get_verify_phone_number_date(self):
-        return self.verify_phone_number_date.strftime('%H:%M - %Y/%m/%d')
+        if self.verify_phone_number_date:
+            return self.verify_phone_number_date.strftime('%H:%M - %Y/%m/%d')
 
     @property
     def get_verify_email_date(self):
-        return self.verify_email_date.strftime('%H:%M - %Y/%m/%d')
+        if self.verify_email_date:
+            return self.verify_email_date.strftime('%H:%M - %Y/%m/%d')
 
     @property
     def get_created_date(self):
