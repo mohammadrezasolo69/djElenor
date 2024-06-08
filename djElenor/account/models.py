@@ -1,23 +1,21 @@
 import uuid
-from collections.abc import Iterable
 from functools import partial
-from typing import Union
-from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
 
 from django.conf import settings
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
-from django.db.models import JSONField, Q, Value
-from django.db.models.expressions import Exists, OuterRef
+from django.db.models import JSONField, Value
+
 from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django_countries.fields import Country, CountryField
 from phonenumber_field.modelfields import PhoneNumber, PhoneNumberField
 
+from djElenor.account.manageres import CustomUserManager
 # from ..app.models import App
 # from ..core.models import ModelWithExternalReference, ModelWithMetadata
 # from ..core.utils.json_serializer import CustomJsonEncoder
@@ -124,235 +122,69 @@ class Address(models.Model):
         return Address.objects.create(**self.as_data())
 
 
-class UserManager(BaseUserManager["User"]):
-    def create_user(
-            self, username, email, password=None, is_staff=False, is_active=True, **extra_fields
-    ):
-        """Create a user instance with the given email and password."""
-        email = UserManager.normalize_email(email)
-        # Google OAuth2 backend send unnecessary username field
-        # extra_fields.pop("username", None)
-
-        user = self.model(
-            username=username, email=email, is_active=is_active, is_staff=is_staff, **extra_fields
-        )
-        if password:
-            user.set_password(password)
-        user.save()
-        return user
-
-    def create_superuser(self, username, email, password=None, **extra_fields):
-        user = self.create_user(
-            username, email, password, is_staff=True, is_superuser=True, **extra_fields
-        )
-        group, created = Group.objects.get_or_create(name="Full Access")
-        # if created:
-        # group.permissions.add(*get_permissions())
-        # group.user_set.add(user)  # type: ignore[attr-defined]
-        return user
-
-    def customers(self):
-        orders = Order.objects.values("user_id")
-        return self.get_queryset().filter(
-            Q(is_staff=False)
-            | (Q(is_staff=True) & (Exists(orders.filter(user_id=OuterRef("pk")))))
-        )
-
-    def staff(self):
-        return self.get_queryset().filter(is_staff=True)
-
-
-class User(
-    AbstractUser
-):
-    # email = models.EmailField(unique=True)
-    # first_name = models.CharField(max_length=256, blank=True)
-    # last_name = models.CharField(max_length=256, blank=True)
-    phone = PhoneNumberField(blank=True, default="", db_index=True)
-
-    addresses = models.ManyToManyField(
-        Address, blank=True, related_name="user_addresses"
-    )
-    # is_staff = models.BooleanField(default=False)
-    # is_active = models.BooleanField(default=True)
-    is_confirmed = models.BooleanField(default=True)
-    last_confirm_email_request = models.DateTimeField(null=True, blank=True)
-    note = models.TextField(null=True, blank=True)
-    date_joined = models.DateTimeField(default=timezone.now, editable=False)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    last_password_reset_request = models.DateTimeField(null=True, blank=True)
-    default_shipping_address = models.ForeignKey(
-        Address, related_name="+", null=True, blank=True, on_delete=models.SET_NULL
-    )
-    default_billing_address = models.ForeignKey(
-        Address, related_name="+", null=True, blank=True, on_delete=models.SET_NULL
-    )
-    avatar = models.ImageField(upload_to="user-avatars", blank=True, null=True)
-    jwt_token_key = models.CharField(
-        max_length=12, default=partial(get_random_string, length=12)
-    )
-    language_code = models.CharField(
-        max_length=35, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE
-    )
-    search_document = models.TextField(blank=True, default="")
-    uuid = models.UUIDField(default=uuid4, unique=True)
-    groups = models.ManyToManyField(
-        Group,
-        verbose_name=_("groups"),
-        blank=True,
-        help_text=_(
-            "The groups this user belongs to. A user will get all permissions "
-            "granted to each of their groups."
-        ),
-        related_name="user_group",
-        related_query_name="user",
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        verbose_name=_("user permissions"),
-        blank=True,
-        help_text=_("Specific permissions for this user."),
-        related_name="user_group",
-        related_query_name="user",
-    )
-
-    # USERNAME_FIELD = "email"
-    USERNAME_FIELD = "username"
-
-    objects = UserManager()
-
+class User(AbstractUser):
     class Meta:
-        ordering = ("email",)
-        # permissions = (
-        #     (AccountPermissions.MANAGE_USERS.codename, "Manage customers."),
-        #     (AccountPermissions.MANAGE_STAFF.codename, "Manage staff."),
-        #     (AccountPermissions.IMPERSONATE_USER.codename, "Impersonate user."),
-        # )
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
+        ordering = ("-created_at",)
         indexes = [
-            # *ModelWithMetadata.Meta.indexes,
-            # Orders searching index
+            GinIndex(name="user_search_gin", fields=["search_document"], opclasses=["gin_trgm_ops"]),
             GinIndex(
-                name="order_user_search_gin",
-                # `opclasses` and `fields` should be the same length
-                fields=["email", "first_name", "last_name"],
-                opclasses=["gin_trgm_ops"] * 3,
-            ),
-            # Account searching index
-            GinIndex(
-                name="user_search_gin",
-                # `opclasses` and `fields` should be the same length
-                fields=["search_document"],
-                opclasses=["gin_trgm_ops"],
-            ),
-            # GinIndex(
-            #     name="user_p_meta_jsonb_path_idx",
-            #     # fields=["private_metadata"],
-            #     opclasses=["jsonb_path_ops"],
-            # ),
+                name="order_user_search_gin", fields=["email", "first_name", "last_name"],
+                opclasses=["gin_trgm_ops"] * 3),
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._effective_permissions = None
+    uuid = models.UUIDField(default=uuid.uuid4(), unique=True)
+    avatar = models.ImageField(upload_to="user-avatars", blank=True, null=True)
+    phone_number = PhoneNumberField(unique=True)
+    note = models.TextField(null=True, blank=True)
+    language_code = models.CharField(max_length=10, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
+    search_document = models.TextField(blank=True, null=True)
+
+    is_active = models.BooleanField(default=False)
+    is_verify_phone_number = models.BooleanField(default=False)
+    is_verify_email = models.BooleanField(default=False)
+
+    verify_phone_number_date = models.DateTimeField(null=True, blank=True)
+    verify_email_date = models.DateTimeField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    # ---------------------- Relation Fields ----------------------
+    addresses = models.ManyToManyField(Address, blank=True, related_name="users")
+    default_shipping_address = models.ForeignKey(
+        Address, on_delete=models.SET_NULL, related_name="users", null=True, blank=True)
+    default_billing_address = models.ForeignKey(
+        Address, on_delete=models.SET_NULL, related_name="users", null=True, blank=True)
+
+    # ---------------------- Setting ----------------------
+    objects = CustomUserManager()
+    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'phone_number'
+
+    # ---------------------- Methods ----------------------
 
     def __str__(self):
-        # Override the default __str__ of AbstractUser that returns username, which may
-        # lead to leaking sensitive data in logs.
-        return str(self.uuid)
+        return self.phone_number
 
-    # @property
-    # def effective_permissions(self) -> models.QuerySet[Permission]:
-    #     if self._effective_permissions is None:
-    #         self._effective_permissions = get_permissions()
-    #         if not self.is_superuser:
-    #             UserPermission = User.user_permissions.through
-    #             user_permission_queryset = UserPermission._default_manager.filter(
-    #                 user_id=self.pk
-    #             ).values("permission_id")
-    #
-    #             UserGroup = User.groups.through
-    #             GroupPermission = Group.permissions.through
-    #             user_group_queryset = UserGroup._default_manager.filter(
-    #                 user_id=self.pk
-    #             ).values("group_id")
-    #             group_permission_queryset = GroupPermission.objects.filter(
-    #                 Exists(user_group_queryset.filter(group_id=OuterRef("group_id")))
-    #             ).values("permission_id")
-    #
-    #             self._effective_permissions = self._effective_permissions.filter(
-    #                 Q(
-    #                     Exists(
-    #                         user_permission_queryset.filter(
-    #                             permission_id=OuterRef("pk")
-    #                         )
-    #                     )
-    #                 )
-    #                 | Q(
-    #                     Exists(
-    #                         group_permission_queryset.filter(
-    #                             permission_id=OuterRef("pk")
-    #                         )
-    #                     )
-    #                 )
-    #             )
-    #     return self._effective_permissions
-    #
-    # @effective_permissions.setter
-    # def effective_permissions(self, value: models.QuerySet[Permission]):
-    #     self._effective_permissions = value
-    #     # Drop cache for authentication backend
-    #     self._effective_permissions_cache = None
-    #
-    # def get_full_name(self):
-    #     if self.first_name or self.last_name:
-    #         return f"{self.first_name} {self.last_name}".strip()
-    #     if self.default_billing_address:
-    #         first_name = self.default_billing_address.first_name
-    #         last_name = self.default_billing_address.last_name
-    #         if first_name or last_name:
-    #             return f"{first_name} {last_name}".strip()
-    #     return self.email
-    #
-    # def get_short_name(self):
-    #     return self.email
-    #
-    # def has_perm(self, perm: Union[BasePermissionEnum, str], obj=None) -> bool:
-    #     # This method is overridden to accept perm as BasePermissionEnum
-    #     perm = perm.value if isinstance(perm, BasePermissionEnum) else perm
-    #
-    #     # Active superusers have all permissions.
-    #     if self.is_active and self.is_superuser and not self._effective_permissions:
-    #         return True
-    #     return _user_has_perm(self, perm, obj)
-    #
-    # def has_perms(
-    #     self, perm_list: Iterable[Union[BasePermissionEnum, str]], obj=None
-    # ) -> bool:
-    #     # This method is overridden to accept perm as BasePermissionEnum
-    #     perm_list = [
-    #         perm.value if isinstance(perm, BasePermissionEnum) else perm
-    #         for perm in perm_list
-    #     ]
-    #     return super().has_perms(perm_list, obj)
-    #
-    # def can_login(self, site_settings: SiteSettings):
-    #     return self.is_active and (
-    #         site_settings.allow_login_without_confirmation
-    #         or not site_settings.enable_account_confirmation_by_email
-    #         or self.is_confirmed
-    #     )
+    @property
+    def get_verify_phone_number_date(self):
+        return self.verify_phone_number_date.strftime('%H:%M - %Y/%m/%d')
+
+    @property
+    def get_verify_email_date(self):
+        return self.verify_email_date.strftime('%H:%M - %Y/%m/%d')
+
+    @property
+    def get_created_date(self):
+        return self.created_date.strftime('%H:%M - %Y/%m/%d')
 
 
 class CustomerNote(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     date = models.DateTimeField(db_index=True, auto_now_add=True)
     content = models.TextField()
     is_public = models.BooleanField(default=True)
-    customer = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="notes", on_delete=models.CASCADE
-    )
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="notes", on_delete=models.CASCADE)
 
     class Meta:
         ordering = ("date",)
@@ -399,7 +231,6 @@ class StaffNotificationRecipient(models.Model):
 
     def get_email(self):
         return self.user.email if self.user else self.staff_email
-
 
 # class GroupManager(models.Manager):
 #     """The manager for the auth's Group model."""
@@ -448,13 +279,3 @@ class StaffNotificationRecipient(models.Model):
 #
 #     def natural_key(self):
 #         return (self.name,)
-class OTPRequest(models.Model):
-    class OtpChannel(models.TextChoices):
-        PHONE = "phone", "Phone"
-        EMAIL = "email", "Email"
-
-    request_id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    channel = models.CharField(max_length=10, choices=OtpChannel.choices, default=OtpChannel.PHONE)
-    receiver = models.CharField(max_length=50)
-    password = models.CharField(max_length=4)
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
