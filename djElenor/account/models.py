@@ -140,7 +140,7 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to="user-avatars", blank=True, null=True)
     phone_number = PhoneNumberField(unique=True,blank=True)
     note = models.TextField(null=True, blank=True)
-    language_code = models.CharField(max_length=10, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
+    language_code = models.CharField(max_length=10, choices=settings.LANGUAGES, default='en')
     search_document = models.TextField(blank=True, null=True)
 
     is_active = models.BooleanField(default=False)

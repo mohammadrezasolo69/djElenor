@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 
+
 import graphene
 import graphql_jwt
 from graphene_django import DjangoObjectType
@@ -80,9 +81,6 @@ class VerifyOtp(graphene.Mutation):
 
         # create or get user
         user, is_new_user = get_or_create_user(phone_number=str(phone_number))
-
-        print(user.phone_number)
-        print(type(user.phone_number))
 
         # create jwt token
         access_token = get_token(user)
