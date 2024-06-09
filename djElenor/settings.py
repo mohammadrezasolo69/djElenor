@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'djElenor.checkout',
     'djElenor.core',
     'djElenor.csv',
-    'djElenor.graphql',
     'djElenor.menu',
     'djElenor.order',
     'djElenor.invoice',
@@ -75,6 +74,7 @@ INSTALLED_APPS = [
 
     # Third party
     'graphene_django',
+    "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
 ]
 
 MIDDLEWARE = [
@@ -121,7 +121,6 @@ DATABASES = {
         'PORT': env("PORT_DB"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -180,9 +179,10 @@ GRAPHQL_JWT = {
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     "JWT_SECRET_KEY": SECRET_KEY,
     "JWT_ALGORITHM": env("JWT_ALGORITHM"),
+    'JWT_PAYLOAD_HANDLER': 'djElenor.utils.custom_jwt_payload_handler.custom_jwt_payload_handler',
 }
 GRAPHENE = {
-    "SCHEMA": "djElenor.graphql.api.schema",
+    "SCHEMA": "djElenor.schema.schema",
     'MIDDLEWARE': [
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
@@ -203,3 +203,7 @@ DEFAULT_MAX_EMAIL_DISPLAY_NAME_LENGTH = 78
 COUNTRIES_OVERRIDE = {"EU": "European Union"}
 
 MAX_USER_ADDRESSES = int(env('MAX_USER_ADDRESSES'))
+
+# config Redis
+REDIS_HOST = env('REDIS_HOST')
+REDIS_PORT = env('REDIS_PORT')
