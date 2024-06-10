@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: DockerFile
+    container_name: 'elenor_app'
+    restart: always
+    command: >
+      sh -c "
+          poetry run python3 manage.py migrate;
+          poetry run python3 manage.py runserver 0.0.0.0:8000;
+        "
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+
