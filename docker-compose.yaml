@@ -20,4 +20,20 @@ services:
       - .:/app
     depends_on:
       - postgres
+      -
 
+  postgres:
+    restart: always
+    image: postgres:16
+    container_name: 'elenor_db'
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${NAME_DB}
+      - POSTGRES_USER=${USER_DB}
+      - POSTGRES_PASSWORD=${PASSWORD_DB}
+      - POSTGRES_EXTENSIONS=gin_trgm_ops
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
