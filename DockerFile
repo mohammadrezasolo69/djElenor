@@ -7,24 +7,27 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONHASHSEED=random
 
 ENV PIP_NO_CACHE_DIR=off
-ENV PIP_DISABLE_PIP_VERSION_CHECK=on
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_DEFAULT_TIMEOUT=100
 
-ENV POETRY_CACHE_DIR='/var/cache/pypoetry'
 
 
-# System update:
-RUN apt-get update
-RUN pip install --upgrade pip
+
+RUN pip install poetry
+
 
 # set work directory
 WORKDIR /app
 
+ENV PATH "./.local/bin:$PATH"
+
 COPY pyproject.toml  .
 COPY poetry.lock .
 
-
+RUN poetry lock
 RUN poetry install
+
 
 # copy project
 COPY . .
+
