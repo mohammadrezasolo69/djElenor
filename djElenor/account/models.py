@@ -136,7 +136,6 @@ class User(AbstractUser):
 
     username = None
 
-    uuid = models.UUIDField(default=uuid.uuid4(), unique=True)
     avatar = models.ImageField(upload_to="user-avatars", blank=True, null=True)
     phone_number = PhoneNumberField(unique=True,blank=True)
     note = models.TextField(null=True, blank=True)
@@ -166,7 +165,7 @@ class User(AbstractUser):
     # ---------------------- Methods ----------------------
 
     def __str__(self):
-        return str(self.uuid)
+        return str(self.id)
 
     @property
     def get_verify_phone_number_date(self):
