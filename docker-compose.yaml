@@ -20,7 +20,6 @@ services:
       - .:/app
     depends_on:
       - postgres
-      -
 
   postgres:
     restart: always
