@@ -51,3 +51,14 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PG_PASSWORD}
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+
+
+  redis:
+    image: redis:7.2
+    container_name: 'elenor_redis'
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+    volumes:
+      - redis_data:/data
