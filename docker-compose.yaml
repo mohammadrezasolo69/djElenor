@@ -37,3 +37,17 @@ services:
       - POSTGRES_EXTENSIONS=gin_trgm_ops
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
+
+
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: 'elenor_pgadmin'
+    restart: always
+    ports:
+      - "${PG_PORT:-8888}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_PASSWORD}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
