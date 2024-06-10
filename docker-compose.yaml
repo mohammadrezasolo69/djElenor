@@ -27,7 +27,7 @@ services:
     image: postgres:16
     container_name: 'elenor_db'
     volumes:
-      - ./dbdata:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data/
     env_file:
       - .env
     environment:
@@ -66,5 +66,5 @@ services:
 
 volumes:
   redis_data:
-  dbdata:
+  postgres_data:
   pgadmin_data:
