@@ -30,7 +30,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 SITE_ID = 1
 
-ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost','*']
 
 # Application definition
 
@@ -75,11 +75,13 @@ INSTALLED_APPS = [
     # Third party
     'graphene_django',
     "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -207,3 +209,8 @@ MAX_USER_ADDRESSES = int(env('MAX_USER_ADDRESSES'))
 # config Redis
 REDIS_HOST = env('REDIS_HOST')
 REDIS_PORT = env('REDIS_PORT')
+
+
+# Cors Config
+CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS').split(',')

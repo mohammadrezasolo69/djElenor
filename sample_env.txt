@@ -1,14 +1,27 @@
-# Base ENV
-SECRET_KEY = 'xoxoxoxoxoxoxoxo'
-DEBUG = 'xoxoxoxoxoxoxoxo'
-JWT_ALGORITHM = 'xoxoxoxoxoxoxoxo'
-DEFAULT_COUNTRY = 'xoxoxoxoxoxoxoxo'
-MAX_USER_ADDRESSES= 'xoxoxoxoxoxoxoxo'
+# Django ENV
+SECRET_KEY='ooooooooooooooooooooooooooooo'
+DEBUG = 'ooooooooooooooooooooooooooooo'
 
-# Database ENV
-ENGINE_DB = 'xoxoxoxoxoxoxoxo'
-NAME_DB = 'xoxoxoxoxoxoxoxo'
-USER_DB = 'xoxoxoxoxoxoxoxo'
-PASSWORD_DB = 'xoxoxoxoxoxoxoxo'
-HOST_DB = 'xoxoxoxoxoxoxoxo'
-PORT_DB = 'xoxoxoxoxoxoxoxo'
+# Setting ENV
+DEFAULT_COUNTRY = 'ooooooooooooooooooooooooooooo'
+JWT_ALGORITHM = 'ooooooooooooooooooooooooooooo'
+MAX_USER_ADDRESSES = 'ooooooooooooooooooooooooooooo'
+
+# Postgres ENV
+ENGINE_DB = 'ooooooooooooooooooooooooooooo'
+NAME_DB = 'ooooooooooooooooooooooooooooo'
+USER_DB = 'ooooooooooooooooooooooooooooo'
+PASSWORD_DB = 'ooooooooooooooooooooooooooooo'
+HOST_DB = 'ooooooooooooooooooooooooooooo'
+PORT_DB = 'ooooooooooooooooooooooooooooo'
+
+# Redis ENV
+REDIS_HOST = 'ooooooooooooooooooooooooooooo'
+REDIS_PORT = 'ooooooooooooooooooooooooooooo'
+
+# PGAdmin ENV
+PG_EMAIL = 'ooooooooooooooooooooooooooooo'
+PG_PASSWORD = 'ooooooooooooooooooooooooooooo'
+
+# Cors ENV
+CSRF_TRUSTED_ORIGINS = 'ooooooooooooooooooooooooooooo'

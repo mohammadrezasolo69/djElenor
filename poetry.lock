@@ -87,7 +87,6 @@ files = [
 
 [package.dependencies]
 aiosignal = ">=1.1.2"
-async-timeout = {version = ">=4.0,<5.0", markers = "python_version < \"3.11\""}
 attrs = ">=17.3.0"
 frozenlist = ">=1.1.1"
 multidict = ">=4.5,<7.0"
@@ -148,9 +147,6 @@ files = [
     {file = "asgiref-3.7.2-py3-none-any.whl", hash = "sha256:89b2ef2247e3b562a16eef663bc0e2e703ec6468e2fa8a5cd61cd449786d4f6e"},
     {file = "asgiref-3.7.2.tar.gz", hash = "sha256:9e0ce3aa93a819ba5b45120216b23878cf6e8525eb3848653452b4192b92afed"},
 ]
-
-[package.dependencies]
-typing-extensions = {version = ">=4", markers = "python_version < \"3.11\""}
 
 [package.extras]
 tests = ["mypy (>=0.800)", "pytest", "pytest-asyncio"]
@@ -495,6 +491,21 @@ files = [
 
 [package.dependencies]
 django = "*"
+
+[[package]]
+name = "django-cors-headers"
+version = "4.3.1"
+description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django-cors-headers-4.3.1.tar.gz", hash = "sha256:0bf65ef45e606aff1994d35503e6b677c0b26cafff6506f8fd7187f3be840207"},
+    {file = "django_cors_headers-4.3.1-py3-none-any.whl", hash = "sha256:0b1fd19297e37417fc9f835d39e45c8c642938ddba1acce0c1753d3edef04f36"},
+]
+
+[package.dependencies]
+asgiref = ">=3.6"
+Django = ">=3.2"
 
 [[package]]
 name = "django-countries"
@@ -1544,6 +1555,21 @@ files = [
 ]
 
 [[package]]
+name = "redis"
+version = "5.0.5"
+description = "Python client for Redis database and key-value store"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "redis-5.0.5-py3-none-any.whl", hash = "sha256:30b47d4ebb6b7a0b9b40c1275a19b87bb6f46b3bed82a89012cf56dea4024ada"},
+    {file = "redis-5.0.5.tar.gz", hash = "sha256:3417688621acf6ee368dec4a04dd95881be24efd34c79f00d31f62bb528800ae"},
+]
+
+[package.extras]
+hiredis = ["hiredis (>=1.0.0)"]
+ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"]
+
+[[package]]
 name = "requests"
 version = "2.31.0"
 description = "Python HTTP for Humans."
@@ -1591,6 +1617,21 @@ files = [
 
 [package.dependencies]
 requests = ">=2.0.1,<3.0.0"
+
+[[package]]
+name = "setuptools"
+version = "70.0.0"
+description = "Easily download, build, install, upgrade, and uninstall Python packages"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "setuptools-70.0.0-py3-none-any.whl", hash = "sha256:54faa7f2e8d2d11bcd2c07bed282eef1046b5c080d1c32add737d7b5817b1ad4"},
+    {file = "setuptools-70.0.0.tar.gz", hash = "sha256:f211a66637b8fa059bb28183da127d4e86396c991a942b028c6650d4319c3fd0"},
+]
+
+[package.extras]
+docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
+testing = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "mypy (==1.9)", "packaging (>=23.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.1)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (>=0.2.1)", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
 name = "six"
@@ -1847,5 +1888,5 @@ xmlsec = ["xmlsec (>=0.6.1)"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10"
-content-hash = "e05d684653d2926e945ca5538c23f0bb602eb8eb38703f5dab702f0e9e2c5adc"
+python-versions = "^3.12"
+content-hash = "24e125309fabdda9eae2152debead002acd5b984460a3ab859aab385fb4e11f2"
